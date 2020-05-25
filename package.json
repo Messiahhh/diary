@@ -9,7 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "commander": "^5.1.0"
+    "commander": "^5.1.0",
+    "moment": "^2.26.0"
   },
   "bin": {
     "diary": "index.js"

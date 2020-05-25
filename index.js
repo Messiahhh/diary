@@ -2,24 +2,22 @@
 const fs = require('fs')
 const path = require('path')
 const cp = require('child_process')
-const homedir = require('os').homedir();
+const homedir = require('os').homedir()
 const { program } = require('commander')
+const moment = require('moment')
+const filepath = path.join(homedir, '.diary')
 
 
-// fs.appendFile('./log.txt', '23333', (err) => {
-//     if (err) throw err
-//     console.log('已经添加');
-    
-// })
-
+if(!fs.existsSync(filepath)) {
+    fs.openSync(filepath, 'w')
+}
 
 program
-    .version('1.0.0')
+    .version('1.0.0', '-v, --ver')
     .description('命令行日记')
-    .option('-s, --show <number>', 'show diary')
+    .option('-s, --show [number]', 'show diary')
     .option('-i, --input', 'write diary')
 program.parse(process.argv)
-
 
 if (program.input) {
     process.stdout.write('今天的心情: ')
@@ -30,15 +28,29 @@ if (program.input) {
         //         console.log(err);
         //     }
         // })
-        fs.appendFileSync(path.join(homedir, '.diary.txt'), chunk, (err) => {
+        fs.appendFileSync(filepath, `[${moment().format("MMM Do YY")}] ${chunk}`, (err) => {
             if (err) throw err
             console.log('已经添加');
         })
         process.stdout.write(`已保存\n`)
         process.exit()
     })
-} else if (program.show) {
-    console.log('看日记');
-} else {
+} 
+else if (program.show) {
+    const showAll = program.show === true 
+    if (showAll) {
+        cp.exec(`tail ${filepath}`, (err, stdout, stderr) => {
+            if (err) throw err
+            console.log(stdout);
+        })
+    } else {
+        cp.exec(`tail -n ${program.show} ${filepath}`, (err, stdout, stderr) => {
+            if (err) throw err
+            console.log(stdout);
+        })
+    }
+    
+} 
+else {
     console.log('啥都没做');
 }
